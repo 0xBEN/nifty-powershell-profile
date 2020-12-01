@@ -1,2 +1,2 @@
 # nifty-powershell-profile
-PowerShell profile template with tools and tricks for more shell efficiency.
+Keeping backups of my personal PowerShell profile here for my own use, but also use by others as desired.
