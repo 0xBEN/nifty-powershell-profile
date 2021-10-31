@@ -207,6 +207,8 @@ Import-Module PSToolbox
 #####################
 
 Set-Alias clipboard Set-Clipboard
+Set-Alias gclip Get-Clipboard
+Set-Alias sclip Set-Clipboard
 Set-Alias cfjson ConvertFrom-Json
 Set-Alias ctjson ConvertTo-Json
 Set-Alias iclixml Import-Clixml
@@ -218,8 +220,6 @@ Set-Alias cfss ConvertFrom-SecureString
 Set-Alias ctcsv ConvertTo-Csv
 Set-Alias cfcsv ConvertFrom-Csv
 Set-Alias cthtml ConvertTo-Html
-Set-Alias gclip Get-Clipboard
-Set-Alias sclip Set-Clipboard
 
 #####################
 #### Environment ####
