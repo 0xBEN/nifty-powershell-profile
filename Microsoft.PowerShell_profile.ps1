@@ -1,4 +1,8 @@
-﻿function Redo-ModuleImport {
+﻿#####################
+##### Functions #####
+#####################
+
+function Redo-ModuleImport {
 
     [CmdletBinding()]
     [Alias("reload")]
@@ -12,15 +16,18 @@
         #### Dynamic Parameter 1: ModuleName ####
         #########################################
         $moduleNameParameterName = 'ModuleName'
-        # Parameter Attributes
+        
+	# Parameter Attributes
         $moduleNameParameterAttributes = New-Object System.Management.Automation.ParameterAttribute # Instantiate empty parameter attributes object for definition below
         $moduleNameParameterAttributesCollection = New-Object 'System.Collections.ObjectModel.Collection[System.Attribute]' # An array to hold any attributes assigned to this parameter
         $moduleNameParameterAttributes.Mandatory = $true # Parameter is mandatory
         $moduleNameParameterAttributes.Position = 0
-        # Parameter should validate inputs on these constraints
+        
+	# Parameter should validate inputs on these constraints
         $moduleNameParameterValidationSet = (Get-Module -All).Name # Get a list of all loaded modules as the set of strings that can be passed in by the user
         $moduleNameParameterValidationSetAttribute = New-Object System.Management.Automation.ValidateSetAttribute($moduleNameParameterValidationSet)
-        # Add the parameter attributes object and the validation set attribute
+        
+	# Add the parameter attributes object and the validation set attribute
         $moduleNameParameterAttributesCollection.Add($moduleNameParameterAttributes)
         $moduleNameParameterAttributesCollection.Add($moduleNameParameterValidationSetAttribute)
         $createModuleNameParameter = New-Object System.Management.Automation.RuntimeDefinedParameter($moduleNameParameterName, [String[]], $moduleNameParameterAttributesCollection)
@@ -187,8 +194,28 @@ function socks {
 
 }
 
+#####################
+###### Modules ######
+#####################
+
 Write-Host "Importing module PSToolbox" -ForegroundColor Green
 Import-Module PSToolbox
+
+#####################
+###### Aliases ######
+#####################
+
+Set-Alias clipboard Set-Clipboard
+Set-Alias cfjson ConvertFrom-Json
+Set-Alias ctjson ConvertTo-Json
+Set-Alias iclixml Import-Clixml
+Set-Alias eclixml Export-Clixml
+Set-Alias cfb64 ConvertFrom-Base64
+Set-Alias ctb64 ConvertTo-Base64
+
+#####################
+#### Environment ####
+#####################
 
 if ($env:OS -like '*Windows*') {
     $apiClientId = "$env:USERPROFILE\Desktop\bitwarden-api-client-id.clixml"
