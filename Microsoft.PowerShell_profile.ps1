@@ -198,7 +198,8 @@ function socks {
 ###### Modules ######
 #####################
 
-Write-Host "Importing module PSToolbox" -ForegroundColor Green
+Write-Host "Importing modules:" -ForegroundColor Green
+Write-Host "PSToolbox"
 Import-Module PSToolbox
 
 #####################
@@ -212,6 +213,13 @@ Set-Alias iclixml Import-Clixml
 Set-Alias eclixml Export-Clixml
 Set-Alias cfb64 ConvertFrom-Base64
 Set-Alias ctb64 ConvertTo-Base64
+Set-Alias ctss ConvertTo-SecureString
+Set-Alias cfss ConvertFrom-SecureString
+Set-Alias ctcsv ConvertTo-Csv
+Set-Alias cfcsv ConvertFrom-Csv
+Set-Alias cthtml ConvertTo-Html
+Set-Alias gclip Get-Clipboard
+Set-Alias sclip Set-Clipboard
 
 #####################
 #### Environment ####
