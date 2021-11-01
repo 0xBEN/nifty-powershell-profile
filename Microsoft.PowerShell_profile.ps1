@@ -268,9 +268,9 @@ if ($env:OS -like '*Windows*') {
     Remove-Item Env:\BW_PASS -Force -ErrorAction SilentlyContinue
 }
 if ($PSVersionTable.Platform -eq 'Unix') {
-    $apiClientId = "$HOME\bitwarden-api-client-id.clixml"
-    $apiClientSecret = "$HOME\bitwarden-api-client-secret.clixml"
-    $encryptedMasterPW = "$HOME\bitwarden-master.clixml"
+    $apiClientId = "$HOME/bitwarden-api-client-id.clixml"
+    $apiClientSecret = "$HOME/bitwarden-api-client-secret.clixml"
+    $encryptedMasterPW = "$HOME/bitwarden-master.clixml"
     if (-not (Test-Path $apiClientId)) {
         $clientId = Read-Host -Prompt "Enter BitWarden API client ID"
         $clientId | ConvertTo-SecureString -AsPlainText -Force | Export-Clixml $apiClientId
