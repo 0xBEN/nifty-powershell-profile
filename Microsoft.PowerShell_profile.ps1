@@ -206,9 +206,28 @@ Import-Module PSToolbox
 ###### Aliases ######
 #####################
 
-Set-Alias clipboard Set-Clipboard
-Set-Alias gclip Get-Clipboard
-Set-Alias sclip Set-Clipboard
+if ($env:OS -like '*Windows*') {
+	Set-Alias clipboard Set-Clipboard
+	Set-Alias gclip Get-Clipboard
+	Set-Alias sclip Set-Clipboard
+}
+if ($PSVersionTable.Platform -eq 'Unix') {
+	
+	function clipboard {
+		[CmdletBinding()]
+		[Alias('Set-Clipboard', 'sclip')]
+		Param (
+			[Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+			[ValidateNotNullOrEmpty()]
+			[String]
+			$InputString
+		)
+		process {
+			$InputString | xclip -i -selection clipboard
+		}
+	}
+
+}
 Set-Alias cfjson ConvertFrom-Json
 Set-Alias ctjson ConvertTo-Json
 Set-Alias iclixml Import-Clixml
