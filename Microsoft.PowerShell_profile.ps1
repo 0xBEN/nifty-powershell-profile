@@ -286,6 +286,7 @@ if ($env:OS -like '*Windows*') {
     Remove-Item Env:\BW_CLIENTSECRET -Force -ErrorAction SilentlyContinue
     Remove-Item Env:\BW_PASS -Force -ErrorAction SilentlyContinue
 }
+
 if ($PSVersionTable.Platform -eq 'Unix') {
     $apiClientId = "$HOME/bitwarden-api-client-id.clixml"
     $apiClientSecret = "$HOME/bitwarden-api-client-secret.clixml"
@@ -308,7 +309,7 @@ if ($PSVersionTable.Platform -eq 'Unix') {
     
     $env:BW_CLIENTID = Import-Clixml $apiClientId | ConvertFrom-SecureString
     $env:BW_CLIENTSECRET = Import-Clixml $apiClientSecret | ConvertFrom-SecureString
-    $bwStatus = bw status | ConvertFrom-Json
+    $bwStatus = bw status 2>/dev/null | ConvertFrom-Json
     if ($bwStatus.Status -eq 'unauthenticated') {
         Write-Warning "BitWarden is not authenticated. Attempting to authenticate and unlock."
         $env:BW_PASS = Import-Clixml $encryptedMasterPW | ConvertFrom-SecureString
