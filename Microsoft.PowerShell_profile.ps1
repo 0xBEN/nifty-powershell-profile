@@ -261,7 +261,6 @@ if ($env:OS -like '*Windows*') {
         $envString = $session -like '*env:*'
         $bwEnv = $envString.Split('"')[1]
         $env:BW_SESSION = $bwEnv
-        $bwEnv | ConvertTo-SecureString -AsPlainText -Force | Export-Clixml $bwSessionKey -Force
     }
 
     Remove-Item Env:\BW_CLIENTID -Force -ErrorAction SilentlyContinue
