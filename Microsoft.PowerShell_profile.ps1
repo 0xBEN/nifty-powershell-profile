@@ -245,16 +245,7 @@ if ($env:OS -like '*Windows*') {
     $env:BW_CLIENTID = Import-Clixml $apiClientId | ConvertFrom-SecureString
     $env:BW_CLIENTSECRET = Import-Clixml $apiClientSecret | ConvertFrom-SecureString
     $bwStatus = bw status | ConvertFrom-Json
-    if ($bwStatus.Status -eq 'unlocked') {
-        Write-Host "Vault authenticated. Attempting to unlock BitWarden vault." -ForegroundColor Green
-        $env:BW_PASS = Import-Clixml $encryptedMasterPW | ConvertFrom-SecureString
-        $session = bw unlock --passwordenv BW_PASS
-        $envString = $session -like '*env:*'
-        $bwEnv = $envString.Split('"')[1]
-        $env:BW_SESSION = $bwEnv
-        $bwEnv | ConvertTo-SecureString -AsPlainText -Force | Export-Clixml $bwSessionKey -Force
-    }
-    else {
+    if ($bwStatus.Status -eq 'unauthenticated') {
         Write-Warning "BitWarden is not authenticated. Attempting to authenticate and unlock."
         $env:BW_PASS = Import-Clixml $encryptedMasterPW | ConvertFrom-SecureString
         bw login --apikey | Out-Null
@@ -262,6 +253,15 @@ if ($env:OS -like '*Windows*') {
         $envString = $session -like '*env:*'
         $bwEnv = $envString.Split('"')[1]
         $env:BW_SESSION = $bwEnv
+    }
+    else {
+        Write-Host "Vault authenticated. Attempting to unlock BitWarden vault." -ForegroundColor Green
+        $env:BW_PASS = Import-Clixml $encryptedMasterPW | ConvertFrom-SecureString
+        $session = bw unlock --passwordenv BW_PASS
+        $envString = $session -like '*env:*'
+        $bwEnv = $envString.Split('"')[1]
+        $env:BW_SESSION = $bwEnv
+        $bwEnv | ConvertTo-SecureString -AsPlainText -Force | Export-Clixml $bwSessionKey -Force
     }
 
     Remove-Item Env:\BW_CLIENTID -Force -ErrorAction SilentlyContinue
@@ -291,18 +291,18 @@ if ($PSVersionTable.Platform -eq 'Unix') {
     $env:BW_CLIENTID = Import-Clixml $apiClientId | ConvertFrom-SecureString
     $env:BW_CLIENTSECRET = Import-Clixml $apiClientSecret | ConvertFrom-SecureString
     $bwStatus = bw status | ConvertFrom-Json
-    if ($bwStatus.Status -eq 'unlocked') {
-        Write-Host "Vault authenticated. Attempting to unlock BitWarden vault." -ForegroundColor Green
+    if ($bwStatus.Status -eq 'unauthenticated') {
+        Write-Warning "BitWarden is not authenticated. Attempting to authenticate and unlock."
         $env:BW_PASS = Import-Clixml $encryptedMasterPW | ConvertFrom-SecureString
+        bw login --apikey | Out-Null
         $session = bw unlock --passwordenv BW_PASS
         $envString = $session -like '*env:*'
         $bwEnv = $envString.Split('"')[1]
         $env:BW_SESSION = $bwEnv
     }
     else {
-        Write-Warning "BitWarden is not authenticated. Attempting to authenticate and unlock."
+        Write-Host "Vault authenticated. Attempting to unlock BitWarden vault." -ForegroundColor Green
         $env:BW_PASS = Import-Clixml $encryptedMasterPW | ConvertFrom-SecureString
-        bw login --apikey | Out-Null
         $session = bw unlock --passwordenv BW_PASS
         $envString = $session -like '*env:*'
         $bwEnv = $envString.Split('"')[1]
