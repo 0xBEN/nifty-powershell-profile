@@ -245,6 +245,10 @@ Set-Alias cthtml ConvertTo-Html
 #####################
 
 function Open-BitWardenVault {
+    
+    [CmdletBinding()]
+    [Alias('obwv')]
+    param()
 
     if ($env:OS -like '*Windows*') {
         $apiClientId = "$env:USERPROFILE\Desktop\bitwarden-api-client-id.clixml"
