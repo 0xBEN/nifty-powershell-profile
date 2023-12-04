@@ -143,24 +143,19 @@ function socks {
 		[Int]$SSHPort = 22,
 		
 		[Parameter(Mandatory = $true, ParameterSetName = 'SSH')]
+  		[Parameter(Mandatory = $true, ParameterSetName = 'Direct')]
 		[ValidateRange(1,65535)]
 		[Int]$ProxyPort = 1337,
 		
 		[Parameter(Mandatory = $true, ParameterSetName = 'Direct')]
 		[ValidateNotNullOrEmpty()]
 		[String]$ProxyHost,
-		
-		[Parameter(Mandatory = $true, ParameterSetName = 'Direct')]
-		[ValidateRange(1,65535)]
-		[Int]$ProxyPort,
-		
+				
 		[Parameter(ParameterSetName = 'Off')]
-		[Switch]
-		$Off,
+		[Switch]$Off,
 	
 		[Parameter(ParameterSetName = 'Status')]
-		[Switch]
-		$Status
+		[Switch]$Status
     )
     begin {
         $checkProxyUp = Get-CimInstance -ClassName Win32_Process | Where-Object {$_.Name -eq 'ssh.exe'} | Where-Object {$_.CommandLine -like '*ssh*-f -C -q -N -D*'}
