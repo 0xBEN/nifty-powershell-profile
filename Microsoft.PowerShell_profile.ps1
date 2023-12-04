@@ -124,33 +124,36 @@ function touch {
 
 function socks {
 	
-    [CmdletBinding(DefaultParameterSetName = 'On')]
+    [CmdletBinding(DefaultParameterSetName = 'SSH')]
     param (
-        [Parameter(Mandatory = $true, ParameterSetName = 'On')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'SSH')]
         [ValidateNotNullOrEmpty()]
-        [String]
-        $Username,
+        [String]$Username,
 
-        [Parameter(Mandatory = $true, ParameterSetName = 'On')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'SSH')]
         [ValidateNotNullOrEmpty()]	
-        [String]
-        $ComputerName,
+        [String]$ComputerName,
 
-        [Parameter(ParameterSetName = 'On')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'SSH')]
         [ValidateNotNullOrEmpty()]	
-        [String]
-        $PrivateKeyFile,
+        [String]$PrivateKeyFile,
 
-        [Parameter(ParameterSetName = 'On')]
+		[Parameter(Mandatory = $true, ParameterSetName = 'SSH')]
         [ValidateRange(1,65535)]
-        [Int]
-        $SSHPort = 22,
+        [Int]$SSHPort = 22,
 
-        [Parameter(ParameterSetName = 'On')]
+		[Parameter(Mandatory = $true, ParameterSetName = 'SSH')]
         [ValidateRange(1,65535)]
-        [Int]
-        $TunnelPort = 1337,
+        [Int]$ProxyPort = 1337,
 
+ 		[Parameter(Mandatory = $true, ParameterSetName = 'Direct')]
+        [ValidateNotNullOrEmpty()]
+		[String]$ProxyHost,
+ 
+		[Parameter(Mandatory = $true, ParameterSetName = 'SSH')]
+        [ValidateRange(1,65535)]
+        [Int]$ProxyPort,
+ 
         [Parameter(ParameterSetName = 'Off')]
         [Switch]
         $Off,
@@ -159,39 +162,46 @@ function socks {
         [Switch]
         $Status
     )
-    if ($env:OS -notlike '*Windows*') {
-        throw "This function is designed to work only on Windows hosts at the moment."
-    }
-    elseif ($Off.IsPresent) {
-        Set-Itemproperty -Path "HKCU:Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name ProxyServer -Value ''
-	    Set-Itemproperty -Path "HKCU:Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name ProxyEnable -Value 0
-        Get-CimInstance -ClassName Win32_Process | 
-            Where-Object {$_.Name -eq 'ssh.exe'} | 
-            Where-Object {$_.CommandLine -like '*ssh*-f -C -q -N -D*'} | 
-            ForEach-Object {Stop-Process -Id $_.ProcessId -Force}
-    }
-    elseif ($Status.IsPresent) {
+    begin {
         $checkProxyUp = Get-CimInstance -ClassName Win32_Process | Where-Object {$_.Name -eq 'ssh.exe'} | Where-Object {$_.CommandLine -like '*ssh*-f -C -q -N -D*'}
-        if ($checkProxyUp) { return 'Up' }
-        else { return 'Down' }
     }
-    else {
-        $checkProxyUp = Get-CimInstance -ClassName Win32_Process | Where-Object {$_.Name -eq 'ssh.exe'} | Where-Object {$_.CommandLine -like '*ssh*-f -C -q -N -D*'}
-        if ($checkProxyUp ) {
-            return
-        }
-        else {
-            Set-Itemproperty -Path "HKCU:Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name ProxyServer -Value "socks=localhost`:$TunnelPort"
-            Set-Itemproperty -Path "HKCU:Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name ProxyEnable -Value 1
-            if ($PrivateKeyFile) {
-                Start-Process ssh -LoadUserProfile -ArgumentList "-i $PrivateKeyFile $Username@$ComputerName -p $SSHPort -f -C -q -N -D $TunnelPort" -NoNewWindow
-            }
-            else {
-                Start-Process ssh -LoadUserProfile -ArgumentList "$Username@$ComputerName -p $SSHPort -f -C -q -N -D $TunnelPort" -NoNewWindow
-            }
-        }
+    process {
+		if ($env:OS -notlike '*Windows*') {
+			throw "This function is designed to work only on Windows hosts at the moment."
+		}
+		elseif ($Off.IsPresent) {
+			Set-Itemproperty -Path "HKCU:Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name ProxyServer -Value ''
+			Set-Itemproperty -Path "HKCU:Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name ProxyEnable -Value 0
+			Get-CimInstance -ClassName Win32_Process | 
+				Where-Object {$_.Name -eq 'ssh.exe'} | 
+				Where-Object {$_.CommandLine -like '*ssh*-f -C -q -N -D*'} | 
+				ForEach-Object {Stop-Process -Id $_.ProcessId -Force}
+		}
+		elseif ($Status.IsPresent) {
+			if ($checkProxyUp) { return 'Up' }
+			else { return 'Down' }
+		}
+		elseif ($PSCmdlet.ParameterSetName -eq 'SSH') {
+			if ($checkProxyUp ) {
+			    return
+			}
+			else {
+		    	Set-Itemproperty -Path "HKCU:Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name ProxyServer -Value "socks=localhost`:$ProxyPort"
+		    	Set-Itemproperty -Path "HKCU:Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name ProxyEnable -Value 1
+			    if ($PrivateKeyFile) {
+					Start-Process ssh -LoadUserProfile -ArgumentList "-i $PrivateKeyFile $Username@$ComputerName -p $SSHPort -f -C -q -N -D $ProxyPort" -NoNewWindow
+		    	}
+		    	else {
+					Start-Process ssh -LoadUserProfile -ArgumentList "$Username@$ComputerName -p $SSHPort -f -C -q -N -D $ProxyPort" -NoNewWindow
+		    	}
+			}
+		}
+		else {
+			Set-Itemproperty -Path "HKCU:Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name ProxyServer -Value "socks=$ProxyHost`:$ProxyPort"
+			Set-Itemproperty -Path "HKCU:Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name ProxyEnable -Value 1
+		}
     }
-
+    end {}
 }
 
 #####################
