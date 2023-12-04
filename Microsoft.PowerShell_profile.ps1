@@ -126,41 +126,41 @@ function socks {
 	
     [CmdletBinding(DefaultParameterSetName = 'SSH')]
     param (
-        [Parameter(Mandatory = $true, ParameterSetName = 'SSH')]
-        [ValidateNotNullOrEmpty()]
-        [String]$Username,
-
-        [Parameter(Mandatory = $true, ParameterSetName = 'SSH')]
-        [ValidateNotNullOrEmpty()]	
-        [String]$ComputerName,
-
-        [Parameter(Mandatory = $true, ParameterSetName = 'SSH')]
-        [ValidateNotNullOrEmpty()]	
-        [String]$PrivateKeyFile,
-
 		[Parameter(Mandatory = $true, ParameterSetName = 'SSH')]
-        [ValidateRange(1,65535)]
-        [Int]$SSHPort = 22,
-
+		[ValidateNotNullOrEmpty()]
+		[String]$Username,
+		
 		[Parameter(Mandatory = $true, ParameterSetName = 'SSH')]
-        [ValidateRange(1,65535)]
-        [Int]$ProxyPort = 1337,
-
- 		[Parameter(Mandatory = $true, ParameterSetName = 'Direct')]
-        [ValidateNotNullOrEmpty()]
+		[ValidateNotNullOrEmpty()]	
+		[String]$ComputerName,
+		
+		[Parameter(Mandatory = $true, ParameterSetName = 'SSH')]
+		[ValidateNotNullOrEmpty()]	
+		[String]$PrivateKeyFile,
+		
+		[Parameter(Mandatory = $true, ParameterSetName = 'SSH')]
+		[ValidateRange(1,65535)]
+		[Int]$SSHPort = 22,
+		
+		[Parameter(Mandatory = $true, ParameterSetName = 'SSH')]
+		[ValidateRange(1,65535)]
+		[Int]$ProxyPort = 1337,
+		
+		[Parameter(Mandatory = $true, ParameterSetName = 'Direct')]
+		[ValidateNotNullOrEmpty()]
 		[String]$ProxyHost,
- 
-		[Parameter(Mandatory = $true, ParameterSetName = 'SSH')]
-        [ValidateRange(1,65535)]
-        [Int]$ProxyPort,
- 
-        [Parameter(ParameterSetName = 'Off')]
-        [Switch]
-        $Off,
-
-        [Parameter(ParameterSetName = 'Status')]
-        [Switch]
-        $Status
+		
+		[Parameter(Mandatory = $true, ParameterSetName = 'Direct')]
+		[ValidateRange(1,65535)]
+		[Int]$ProxyPort,
+		
+		[Parameter(ParameterSetName = 'Off')]
+		[Switch]
+		$Off,
+	
+		[Parameter(ParameterSetName = 'Status')]
+		[Switch]
+		$Status
     )
     begin {
         $checkProxyUp = Get-CimInstance -ClassName Win32_Process | Where-Object {$_.Name -eq 'ssh.exe'} | Where-Object {$_.CommandLine -like '*ssh*-f -C -q -N -D*'}
